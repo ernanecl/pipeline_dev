@@ -1,0 +1,13 @@
+- hosts: all
+
+  tasks:
+
+    - name: "Deleta pods anteriores do ambiente de dev"
+      shell: "kubectl delete deployment java-deployment-dev && kubectl delete configmap mysql-configmap-dev && kubectl delete secret mysql-secret-dev && kubectl delete service nodeport-pod-javadb-dev"
+      become: yes
+      ignore_errors: yes
+
+
+    - name: "Sobe pods de desenvolvimento"
+      shell: "kubectl apply -f /root/dev-deployment.yml"
+      become: yes

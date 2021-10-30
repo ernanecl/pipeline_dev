@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone repo infra') {
+            steps {
+                git url: 'https://github.com/carol-palomo/pipeline_dev.git', branch: 'main'
+            }
+        }
+        stage('Copy files k8s') {
+            steps {
+                sh "/var/lib/jenkins/workspace/pipeline-app/provisiona.sh"
+            }
+        }
+        stage('Deploy DEV') {
+            steps {
+                sh "/var/lib/jenkins/workspace/pipeline-app/provisiona-dev.sh"
+            }
+        }
+        stage('Test deploy dev') {
+            steps {
+                sh "/var/lib/jenkins/workspace/pipeline-app/teste-dev.sh"
+            }
+        }
+        stage('Deploy Stage') {
+            steps {
+                sh "/var/lib/jenkins/workspace/pipeline-app/provisiona-stg.sh"
+            }
+        }
+        stage('Test deploy stage') {
+            steps {
+                sh "/var/lib/jenkins/workspace/pipeline-app/teste-stg.sh"
+            }
+        }
+        // manual step
+        stage('Deploy Prod') {
+            steps {
+                sh "/var/lib/jenkins/workspace/pipeline-app/provisiona-prd.sh"
+            }
+        }
+        stage('Test deploy prod') {
+            steps {
+                sh "/var/lib/jenkins/workspace/pipeline-app/teste-prd.sh"
+            }
+        }
+    }
+}

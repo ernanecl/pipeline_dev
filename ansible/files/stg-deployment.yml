@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-deployment-stg
+spec:
+  template:
+    metadata:
+      name: pod-javadb-stg
+      labels:
+        app: pod-javadb-stg
+    spec:
+      containers:
+        - name: container-pod-javadb-stg
+          image: carolinap/spring-web-youtube:v0.0.2
+          env:
+            - name: USER
+              valueFrom:
+                configMapKeyRef:
+                  name: mysql-configmap-stg
+                  key: USER
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret-stg
+                  key: PASSWORD
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: mysql-configmap-stg
+                  key: DATABASE_URL
+          ports:
+            - containerPort: 8080
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pod-javadb-stg
+---
+###ConfigMap###
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-configmap-stg
+data:
+  USER: root
+  DATABASE_URL: mysql://10.1.0.92:3306/SpringWebYoutubeTest?useTimezone=true&serverTimezone=UTC
+---
+###MySQL-Secret###
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret-stg
+data:
+  PASSWORD: cm9vdA== # senha encoded para base64
+---
+###NodePort###
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodeport-pod-javadb-stg
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      nodePort: 30003 # 30000 ~ 32767
+  selector:
+    app: pod-javadb-stg

@@ -1,0 +1,13 @@
+- hosts: all
+
+  tasks:
+
+    - name: "Deleta pods anteriores do ambiente de stage"
+      shell: "kubectl delete deployment java-deployment-stg && kubectl delete configmap mysql-configmap-stg && kubectl delete secret mysql-secret-dev stg kubectl delete service nodeport-pod-javadb-stg"
+      become: yes
+      ignore_errors: yes
+
+
+    - name: "Sobe pods do ambiente de stage"
+      shell: "kubectl apply -f /root/stg-deployment.yml"
+      become: yes

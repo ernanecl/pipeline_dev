@@ -1,0 +1,13 @@
+- hosts: all
+
+  tasks:
+
+    - name: "Deleta pods anteriores do ambiente de produção"
+      shell: "kubectl delete deployment java-deployment-prd && kubectl delete configmap mysql-configmap-prd && kubectl delete secret mysql-secret-prd stg kubectl delete service nodeport-pod-javadb-prd"
+      become: yes
+      ignore_errors: yes
+
+
+    - name: "Sobe pods do ambiente de produção"
+      shell: "kubectl apply -f /root/prd-deployment.yml"
+      become: yes

@@ -1,0 +1,21 @@
+- hosts: all
+
+  tasks:
+
+    - name: "Copia arquivo do ambiente dev"
+      copy:
+        src: 'files/dev-deployment.yml'
+        dest: '~/dev-deployment.yml'
+      become: yes
+
+    - name: "Copia arquivo do ambiente stage"
+      copy:
+        src: 'files/stg-deployment.yml'
+        dest: '~/stg-deployment.yml'
+      become: yes
+
+    - name: "Copia arquivo do ambiente prod"
+      copy:
+        src: 'files/prd-deployment.yml'
+        dest: '~/prd-deployment.yml'
+      become: yes

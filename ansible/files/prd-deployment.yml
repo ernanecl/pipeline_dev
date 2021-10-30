@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-deployment-prd
+spec:
+  template:
+    metadata:
+      name: pod-javadb-prd
+      labels:
+        app: pod-javadb-prd
+    spec:
+      containers:
+        - name: container-pod-javadb-prd
+          image: carolinap/spring-web-youtube:v0.0.2
+          env:
+            - name: USER
+              valueFrom:
+                configMapKeyRef:
+                  name: mysql-configmap-prd
+                  key: USER
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret-prd
+                  key: PASSWORD
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: mysql-configmap-prd
+                  key: DATABASE_URL
+          ports:
+            - containerPort: 8080
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pod-javadb-prd
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-configmap-prd
+data:
+  USER: root
+  DATABASE_URL: mysql://10.1.0.78:3306/SpringWebYoutubeTest?useTimezone=true&serverTimezone=UTC
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret-prd
+data:
+  PASSWORD: cm9vdA== # senha encoded para base64
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodeport-pod-javadb-prd
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      nodePort: 30004 # 30000 ~ 32767
+  selector:
+    app: pod-javadb-prd
